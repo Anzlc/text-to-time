@@ -1,4 +1,4 @@
 [workspace]
-members = [
+members = [ "app",
     "network"
 ]

@@ -54,13 +54,13 @@ impl Network<'_> {
         current.data[0].to_owned()
     }
 
-    pub fn back_propagate(&mut self, outputs: Vec<f64>, targets: Vec<f64>) {
+    pub fn back_propagate(&mut self, outputs: &[f64], targets: &[f64]) {
         if targets.len() != *self.layers.last().unwrap() {
             panic!("Invalid number of targets");
         }
 
-        let mut parsed = Matrix::from(vec![outputs]);
-        let mut errors = Matrix::from(vec![targets]);
+        let mut parsed = Matrix::from(vec![outputs.to_owned()]);
+        let mut errors = Matrix::from(vec![targets.to_owned()]).sub(&parsed);
         let mut gradients = parsed.map(self.activation.derivative);
 
         for i in (0..self.layers.len() - 1).rev() {
@@ -74,13 +74,18 @@ impl Network<'_> {
     }
 
     pub fn train(&mut self, inputs: Vec<Vec<f64>>, targets: Vec<Vec<f64>>, epochs: u16) {
+        if inputs.len() != targets.len() {
+            panic!("Length of inputs and targets does not match");
+        }
+
         for i in 1..=epochs {
             print!("Epoch {}/{}\r", i, epochs);
 
             for j in 0..inputs.len() {
                 let outputs = self.feed_forward(&inputs[j]);
-                self.back_propagate(outputs, targets[j].clone());
+                self.back_propagate(&outputs, &targets[j]);
             }
         }
+        println!("Finished training");
     }
 }

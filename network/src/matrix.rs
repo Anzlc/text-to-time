@@ -116,10 +116,10 @@ impl Matrix {
     }
 }
 
-// impl Add<Matrix> for Matrix {
+// impl Add<&Matrix> for Matrix {
 //     type Output = Matrix;
 
-//     fn add(self, rhs: Matrix) -> Self::Output {
+//     fn add(self, rhs: &Matrix) -> Self::Output {
 //         if self.rows != rhs.rows || self.cols != rhs.cols {
 //             panic!("Attempted to add with incorrect dimensions");
 //         }
@@ -136,10 +136,10 @@ impl Matrix {
 //     }
 // }
 
-// impl Sub<Matrix> for Matrix {
+// impl Sub<&Matrix> for Matrix {
 //     type Output = Matrix;
 
-//     fn sub(self, rhs: Matrix) -> Matrix {
+//     fn sub(self, rhs: &Matrix) -> Matrix {
 //         if self.rows != rhs.rows || self.cols != rhs.cols {
 //             panic!("Attempted to subtract with incorrect dimensions");
 //         }
@@ -156,10 +156,10 @@ impl Matrix {
 //     }
 // }
 
-// impl Mul<Matrix> for Matrix {
+// impl Mul<&Matrix> for Matrix {
 //     type Output = Matrix;
 
-//     fn mul(self, rhs: Matrix) -> Matrix {
+//     fn mul(self, rhs: &Matrix) -> Matrix {
 //         if self.cols != rhs.rows {
 //             panic!("Attempted to multiply by matrix of incorrect dimensions");
 //         }
