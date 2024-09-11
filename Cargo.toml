@@ -1,4 +1,4 @@
 [workspace]
-members = [ "app", "data-loader",
+members = [ "app", "data_loader",
     "network"
 ]

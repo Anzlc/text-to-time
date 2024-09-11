@@ -1,4 +1,4 @@
-use std::vec;
+use std::{ io::Write, vec };
 
 use crate::{ activation::{ self, Activation, SIGMOID }, matrix::Matrix };
 
@@ -42,8 +42,8 @@ impl Network<'_> {
 
         let mut current = Matrix::from(vec![inputs.to_owned()]).transpose();
         self.data = vec![current.clone()];
-
         for i in 0..self.layers.len() - 1 {
+            let tmp = current.clone();
             current = self.weights[i]
                 .mul(&current)
                 .add(&self.biases[i])
@@ -51,7 +51,7 @@ impl Network<'_> {
             self.data.push(current.clone());
         }
 
-        current.data[0].to_owned()
+        current.transpose().data[0].to_owned()
     }
 
     pub fn back_propagate(&mut self, outputs: &[f64], targets: &[f64]) {
@@ -59,12 +59,15 @@ impl Network<'_> {
             panic!("Invalid number of targets");
         }
 
-        let mut parsed = Matrix::from(vec![outputs.to_owned()]);
-        let mut errors = Matrix::from(vec![targets.to_owned()]).sub(&parsed);
+        let mut parsed = Matrix::from(vec![outputs.to_owned()]).transpose();
+        let mut errors = Matrix::from(vec![targets.to_owned()]).transpose().sub(&parsed);
         let mut gradients = parsed.map(self.activation.derivative);
 
         for i in (0..self.layers.len() - 1).rev() {
             gradients = gradients.dot_multiply(&errors).map(&(|x| x * self.learning_rate));
+            // gradients = gradients.map(
+            //     &(|x| if x > 1.0 { 1.0 } else if x < -1.0 { -1.0 } else { x })
+            // );
             self.weights[i] = self.weights[i].add(&gradients.mul(&self.data[i].transpose()));
             self.biases[i] = self.biases[i].add(&gradients);
 
@@ -73,14 +76,15 @@ impl Network<'_> {
         }
     }
 
-    pub fn train(&mut self, inputs: Vec<Vec<f64>>, targets: Vec<Vec<f64>>, epochs: u16) {
+    pub fn train(&mut self, inputs: &Vec<Vec<f64>>, targets: &Vec<Vec<f64>>, epochs: u16) {
+        println!("Started training");
         if inputs.len() != targets.len() {
             panic!("Length of inputs and targets does not match");
         }
 
         for i in 1..=epochs {
             print!("Epoch {}/{}\r", i, epochs);
-
+            std::io::stdout().flush();
             for j in 0..inputs.len() {
                 let outputs = self.feed_forward(&inputs[j]);
                 self.back_propagate(&outputs, &targets[j]);

@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 network = {path = "../network"}
+data-loader = {path = "../data_loader"}

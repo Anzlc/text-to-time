@@ -2,7 +2,7 @@ use std::ops::{ Add, Mul, Sub };
 
 use rand::{ self, Rng };
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Matrix {
     pub rows: usize,
     pub cols: usize,
@@ -24,7 +24,7 @@ impl Matrix {
 
         for i in 0..rows {
             for j in 0..cols {
-                res.data[i][j] = rng.gen();
+                res.data[i][j] = rng.gen::<f64>() * 2.0 - 1.0;
             }
         }
         res
@@ -86,7 +86,13 @@ impl Matrix {
     }
     pub fn add(&self, rhs: &Matrix) -> Matrix {
         if self.rows != rhs.rows || self.cols != rhs.cols {
-            panic!("Attempted to add with incorrect dimensions");
+            panic!(
+                "Attempted to add with incorrect dimensions {}-{} {}-{}",
+                self.rows,
+                rhs.rows,
+                self.cols,
+                rhs.cols
+            );
         }
 
         let mut res = Matrix::zeros(self.rows, self.cols);
@@ -101,7 +107,13 @@ impl Matrix {
     }
     pub fn sub(&self, rhs: &Matrix) -> Matrix {
         if self.rows != rhs.rows || self.cols != rhs.cols {
-            panic!("Attempted to subtract with incorrect dimensions");
+            panic!(
+                "Attempted to subtract with incorrect dimensions rows: {}-{} cols: {}-{}",
+                self.rows,
+                rhs.rows,
+                self.cols,
+                rhs.cols
+            );
         }
 
         let mut res = Matrix::zeros(self.rows, self.cols);
