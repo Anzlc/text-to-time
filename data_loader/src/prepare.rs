@@ -58,7 +58,7 @@ impl TrainingData {
         }
         for (j, c) in data.chars().enumerate() {
             natural_input[j] =
-                *self.character_map.get(&c).unwrap() / (self.character_map.len() as f64);
+                *self.character_map.get(&c).unwrap_or(&0.0) / (self.character_map.len() as f64);
         }
 
         natural_input

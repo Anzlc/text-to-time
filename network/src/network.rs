@@ -87,6 +87,7 @@ impl Network<'_> {
             std::io::stdout().flush();
             for j in 0..inputs.len() {
                 let outputs = self.feed_forward(&inputs[j]);
+
                 self.back_propagate(&outputs, &targets[j]);
             }
         }

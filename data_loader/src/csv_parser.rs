@@ -17,7 +17,7 @@ pub fn read_and_parse_time(path: &str) -> Vec<TimeData> {
         let formatted_time = parts.next().unwrap();
 
         entries.push(TimeData {
-            natural_time: natural_time.to_owned(),
+            natural_time: natural_time.to_lowercase().to_owned(),
             formatted_time: formatted_time.to_owned(),
         });
     }
