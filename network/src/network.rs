@@ -1,5 +1,6 @@
-use std::{ io::Write, vec };
+use std::{ fs::File, io::{ self, BufReader, Read, Write }, vec };
 use data_loader::TrainingData;
+use rand::Error;
 use crate::{ activation::{ self, Activation, SIGMOID }, matrix::Matrix };
 
 pub struct Network<'a> {
@@ -129,5 +130,65 @@ impl Network<'_> {
             std::io::stdout().flush();
         }
         println!("");
+    }
+
+    pub fn save(&self, file: &str) -> Result<(), io::Error> {
+        let mut file = File::create(file)?;
+        let mut buffer: Vec<u8> = Vec::new();
+        for i in 0..self.layers.len() - 1 {
+            let matrix = &self.weights[i];
+            for rows in 0..matrix.rows {
+                for cols in 0..matrix.cols {
+                    let _ = buffer.write(&matrix.data[rows][cols].to_be_bytes());
+                }
+            }
+        }
+        for i in 0..self.layers.len() - 1 {
+            let matrix = &self.biases[i];
+            for rows in 0..matrix.rows {
+                for cols in 0..matrix.cols {
+                    let _ = buffer.write(&matrix.data[rows][cols].to_be_bytes());
+                }
+            }
+        }
+        file.write(&buffer)?;
+        Ok(())
+    }
+    pub fn load(&mut self, path: &str) -> Result<(), io::Error> {
+        let mut file = File::open(path)?;
+        let mut bufreader = BufReader::new(file);
+        let mut data = Vec::new();
+        bufreader.read_to_end(&mut data);
+        self.load_from_bytes(&data);
+        Ok(())
+    }
+
+    fn load_from_bytes(&mut self, data: &[u8]) {
+        let mut data = data.chunks(8).map(|x: &[u8]| f64::from_be_bytes(x.try_into().unwrap()));
+
+        for i in 0..self.layers.len() - 1 {
+            let matrix = &mut self.weights[i];
+            for rows in 0..matrix.rows {
+                for cols in 0..matrix.cols {
+                    //matrix.data[rows][cols] = f64::from_be_bytes(data[rows * cols + cols]);
+                    //matrix.data[rows][cols] = data[rows * matrix.rows + cols];
+                    matrix.data[rows][cols] = data.next().unwrap();
+                }
+            }
+        }
+        // let offset: usize = self.weights[..self.layers.len() - 1]
+        //     .iter()
+        //     .map(|x| x.cols * x.rows)
+        //     .sum();
+        // println!("{offset}");
+        for i in 0..self.layers.len() - 1 {
+            let matrix = &mut self.biases[i];
+            for rows in 0..matrix.rows {
+                for cols in 0..matrix.cols {
+                    // matrix.data[rows][cols] = data[rows * matrix.rows + cols + offset];
+                    matrix.data[rows][cols] = data.next().unwrap();
+                }
+            }
+        }
     }
 }

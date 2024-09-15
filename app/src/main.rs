@@ -20,12 +20,14 @@ fn main() {
     let training_output = &training_data.get_training_output()[..testing_count];
     let testing_output = &training_data.get_training_output()[testing_count..];
 
-    network.train_with_testing(
-        &training_input.to_vec(),
-        &training_output.to_vec(),
-        &testing_input.to_vec(),
-        &testing_output.to_vec()
-    );
+    // network.train_with_testing(
+    //     &training_input.to_vec(),
+    //     &training_output.to_vec(),
+    //     &testing_input.to_vec(),
+    //     &testing_output.to_vec()
+    // );
+    //network.save("network.data");
+    network.load("network.data");
 
     loop {
         let mut input = String::new();
