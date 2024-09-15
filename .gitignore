@@ -3,3 +3,5 @@
 /target
 /target/**
 **/target/
+data.csv
+network.data
