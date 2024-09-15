@@ -6,41 +6,32 @@ use data_loader::TrainingData;
 use data_loader::read_and_parse_time;
 fn main() {
     println!("Hello, world!");
-    let mut training_data = TrainingData::generate_training_data(
-        &read_and_parse_time("./data.csv")
-    );
-    let mut network: Network<'_> = Network::new(&[64, 32, 4, 2], SIGMOID, 0.01);
-    let mut prev_best = 0;
-    loop {
-        network.train(
-            &training_data.get_training_input(),
-            &training_data.get_training_output(),
-            100
-        );
-        let mut correct = 0;
-        for (i, inputs) in training_data.get_training_input().into_iter().enumerate() {
-            if network.feed_forward(&inputs) == training_data.get_training_output()[i] {
-                correct += 1;
-            }
-        }
-        println!("Correctnes: {}", correct);
-        if correct >= prev_best {
-            prev_best = correct;
-        } else {
-            break;
-        }
-    }
+    let data = read_and_parse_time("./data.csv");
+    let mut training_data = TrainingData::generate_training_data(&data);
+    let mut network: Network<'_> = Network::new(&[64, 256, 128, 84], SIGMOID, 0.2);
 
-    println!("Correctness {}/{}", prev_best, training_data.get_training_input().len());
+    const TRAINING_PERCENTAGE: f64 = 0.9;
+    let testing_count = (
+        (training_data.get_training_input().len() as f64) * TRAINING_PERCENTAGE
+    ).floor() as usize;
+
+    let training_input = &training_data.get_training_input()[..testing_count];
+    let testing_input = &training_data.get_training_input()[testing_count..];
+    let training_output = &training_data.get_training_output()[..testing_count];
+    let testing_output = &training_data.get_training_output()[testing_count..];
+
+    network.train_with_testing(
+        &training_input.to_vec(),
+        &training_output.to_vec(),
+        &testing_input.to_vec(),
+        &testing_output.to_vec()
+    );
+
     loop {
         let mut input = String::new();
         let _ = std::io::stdin().read_line(&mut input);
-        let result = network.feed_forward(&training_data.to_input(&input));
-        let mut res_iter = result.into_iter();
-        println!(
-            "{}: {}",
-            input,
-            TrainingData::from_output(&[res_iter.next().unwrap(), res_iter.next().unwrap()])
-        );
+        let result = network.feed_forward(&training_data.to_input(&input.trim()));
+
+        println!("\r{}: {}", input.trim(), TrainingData::from_output(&result));
     }
 }

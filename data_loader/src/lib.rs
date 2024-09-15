@@ -9,14 +9,22 @@ pub struct TimeData {
 }
 
 impl TimeData {
-    fn get_parsed_time(&self) -> [f64; 2] {
+    fn get_parsed_time(&self) -> [f64; 84] {
         let mut split = self.formatted_time.split(":");
         if split.clone().count() != 2 {
             panic!("Invalid time format: hh:mm - {}", self.formatted_time);
         }
-        [
-            split.next().unwrap().parse::<f64>().unwrap() / 24.0,
-            split.next().unwrap().parse::<f64>().unwrap() / 60.0,
-        ]
+        let mut res = [0.0; 84];
+
+        let hours = split.next().unwrap().parse::<usize>().unwrap();
+        let minutes = split.next().unwrap().parse::<usize>().unwrap();
+
+        assert!(hours <= 24);
+        assert!(minutes < 60);
+
+        res[hours] = 1.0;
+        res[minutes + 24] = 1.0;
+
+        res
     }
 }

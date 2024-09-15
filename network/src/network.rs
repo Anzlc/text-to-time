@@ -1,5 +1,5 @@
 use std::{ io::Write, vec };
-
+use data_loader::TrainingData;
 use crate::{ activation::{ self, Activation, SIGMOID }, matrix::Matrix };
 
 pub struct Network<'a> {
@@ -92,5 +92,42 @@ impl Network<'_> {
             }
         }
         println!("Finished training");
+    }
+
+    pub fn train_with_testing(
+        &mut self,
+        inputs_training: &Vec<Vec<f64>>,
+        targets_training: &Vec<Vec<f64>>,
+        inputs_testing: &Vec<Vec<f64>>,
+        targets_testing: &Vec<Vec<f64>>
+    ) {
+        let mut prev_best = 0;
+        loop {
+            for _ in 0..200 {
+                for j in 0..inputs_training.len() {
+                    let outputs = self.feed_forward(&inputs_training[j]);
+
+                    self.back_propagate(&outputs, &targets_training[j]);
+                }
+            }
+
+            let mut correct = 0;
+            for (i, inputs) in inputs_testing.into_iter().enumerate() {
+                if
+                    TrainingData::from_output(&self.feed_forward(&inputs)) ==
+                    TrainingData::from_output(&targets_testing[i])
+                {
+                    correct += 1;
+                }
+                //println!("Got right: {}", TrainingData::from_output(&self.feed_forward(&inputs)));
+            }
+            if correct < prev_best {
+                break;
+            }
+            prev_best = correct;
+            print!("Current best: {}\r", prev_best);
+            std::io::stdout().flush();
+        }
+        println!("");
     }
 }
