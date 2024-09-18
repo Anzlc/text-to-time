@@ -1,7 +1,6 @@
 use std::{ fs::File, io::{ self, BufReader, Read, Write }, vec };
 use data_loader::TrainingData;
-use rand::Error;
-use crate::{ activation::{ self, Activation, SIGMOID }, matrix::Matrix };
+use crate::{ activation::Activation, matrix::Matrix };
 
 pub struct Network<'a> {
     layers: &'a [usize],
@@ -120,16 +119,61 @@ impl Network<'_> {
                 {
                     correct += 1;
                 }
-                //println!("Got right: {}", TrainingData::from_output(&self.feed_forward(&inputs)));
             }
             if correct < prev_best {
                 break;
             }
             prev_best = correct;
             print!("Current best: {}\r", prev_best);
-            std::io::stdout().flush();
+            let _ = std::io::stdout().flush();
         }
         println!("");
+    }
+
+    pub fn train_with_testing_and_save(
+        &mut self,
+        inputs_training: &Vec<Vec<f64>>,
+        targets_training: &Vec<Vec<f64>>,
+        inputs_testing: &Vec<Vec<f64>>,
+        targets_testing: &Vec<Vec<f64>>,
+        file: &str
+    ) {
+        let mut prev_best = 0;
+
+        loop {
+            for _ in 0..10 {
+                for j in 0..inputs_training.len() {
+                    let outputs = self.feed_forward(&inputs_training[j]);
+
+                    self.back_propagate(&outputs, &targets_training[j]);
+                }
+            }
+
+            let mut correct = 0;
+            for (i, inputs) in inputs_testing.into_iter().enumerate() {
+                if
+                    TrainingData::from_output(&self.feed_forward(&inputs)) ==
+                    TrainingData::from_output(&targets_testing[i])
+                {
+                    correct += 1;
+                }
+            }
+
+            if correct < prev_best {
+                continue;
+            } else if correct > prev_best {
+                prev_best = correct;
+
+                match self.save(file) {
+                    Ok(_) =>
+                        println!("\nSaved with a score of {}/{}", correct, targets_testing.len()),
+                    Err(_) => println!("Failed to save model!"),
+                }
+            }
+
+            print!("Current best: {}, current: {}\r", prev_best, correct);
+            let _ = std::io::stdout().flush();
+        }
     }
 
     pub fn save(&self, file: &str) -> Result<(), io::Error> {
@@ -155,15 +199,15 @@ impl Network<'_> {
         Ok(())
     }
     pub fn load(&mut self, path: &str) -> Result<(), io::Error> {
-        let mut file = File::open(path)?;
-        let mut bufreader = BufReader::new(file);
+        let file = File::open(path)?;
+        let mut buf_reader = BufReader::new(file);
         let mut data = Vec::new();
-        bufreader.read_to_end(&mut data);
+        buf_reader.read_to_end(&mut data)?;
         self.load_from_bytes(&data);
         Ok(())
     }
 
-    fn load_from_bytes(&mut self, data: &[u8]) {
+    pub fn load_from_bytes(&mut self, data: &[u8]) {
         let mut data = data.chunks(8).map(|x: &[u8]| f64::from_be_bytes(x.try_into().unwrap()));
 
         for i in 0..self.layers.len() - 1 {
@@ -176,11 +220,7 @@ impl Network<'_> {
                 }
             }
         }
-        // let offset: usize = self.weights[..self.layers.len() - 1]
-        //     .iter()
-        //     .map(|x| x.cols * x.rows)
-        //     .sum();
-        // println!("{offset}");
+
         for i in 0..self.layers.len() - 1 {
             let matrix = &mut self.biases[i];
             for rows in 0..matrix.rows {

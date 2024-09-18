@@ -1,4 +1,3 @@
 [workspace]
 members = [ "app", "data_loader",
-    "network"
-]
+    "network", "wasm"]

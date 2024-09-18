@@ -1,0 +1,9 @@
+[package]
+name = "wasm"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+network = {path = "../network"}
+data_loader = {path = "../data_loader"}
+wasm-bindgen = "0.2.93"

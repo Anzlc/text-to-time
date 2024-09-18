@@ -1,4 +1,4 @@
-use std::collections::{ HashMap, HashSet };
+use std::{ collections::HashMap, fs::File, io::{ self, Write } };
 
 use crate::TimeData;
 
@@ -8,15 +8,22 @@ pub struct TrainingData {
     outputs: Vec<[f64; 84]>,
 }
 impl TrainingData {
+    pub fn empty() -> TrainingData {
+        TrainingData {
+            character_map: HashMap::new(),
+            inputs: Vec::new(),
+            outputs: Vec::new(),
+        }
+    }
     pub fn generate_training_data(data: &[TimeData]) -> TrainingData {
         let mut inputs: Vec<[f64; 64]> = Vec::new();
         let mut outputs: Vec<[f64; 84]> = Vec::new();
 
         let mut character_map: HashMap<char, f64> = HashMap::new();
 
-        for (i, time) in data.into_iter().enumerate() {
+        for time in data.into_iter() {
             let mut natural_input: [f64; 64] = [0.0; 64];
-            let mut formatted_output: [f64; 84] = [0.0; 84];
+
             if time.natural_time.len() > 64 {
                 panic!("Input \"{}\" exceeded 64 characters!", time.natural_time);
             }
@@ -93,5 +100,27 @@ impl TrainingData {
             .into_iter()
             .map(|x| x.to_vec())
             .collect()
+    }
+    pub fn save_map(&self, path: &str) -> Result<(), io::Error> {
+        let mut file = File::create(path)?;
+        let mut buffer: Vec<u8> = Vec::new();
+        for (k, v) in &self.character_map {
+            buffer.append(&mut (k.clone() as u32).to_be_bytes().to_vec());
+            buffer.append(&mut v.to_be_bytes().to_vec());
+        }
+        file.write(&buffer)?;
+        Ok(())
+    }
+    pub fn load_map_bytes(&mut self, bytes: &[u8]) {
+        let values: Vec<(char, f64)> = bytes
+            .chunks(12)
+            .map(|x| (
+                char::from_u32(u32::from_be_bytes(x[..4].try_into().unwrap())).unwrap(),
+                f64::from_be_bytes(x[4..].try_into().unwrap()),
+            ))
+            .collect();
+        for (k, v) in values {
+            self.character_map.insert(k, v);
+        }
     }
 }
