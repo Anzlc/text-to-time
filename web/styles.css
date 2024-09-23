@@ -1,0 +1,132 @@
+body {
+    font-family: "Roboto Mono", monospace;
+    font-weight: 600;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 100svh;
+    background: linear-gradient(
+		-45deg,
+		#ffffff,
+		#ffe4e9,
+		#fcc8e2,
+		#f6baed,
+		#efb0ff,
+		#d3a2ff,
+		#8eb8ff,
+		#91efff,
+		#d5f9ff
+	);
+	background-size: 400% 400%;
+	animation: gradient 21s ease infinite;
+	height: 100svh;
+}
+
+#bottom {
+    position: absolute;
+    right: 30px;
+    bottom: 30px;
+
+}
+
+#bottom .button {
+    aspect-ratio: 1;
+    height: 50px;
+    transition: all 250ms;
+}
+
+#bottom .button:hover {
+    transform: scale(1.1);
+}
+
+
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
+#formated-output {
+    font-size: 20px;
+}
+
+input {
+    outline: none;
+    height: 3em;
+    width: 20em;
+    border: 0;
+    border-radius: 8px;
+    transition: 200ms all;
+    -webkit-box-shadow: 0px 0px 47px 8px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0px 0px 47px 8px rgba(0,0,0,0.2);
+    box-shadow: 0px 0px 47px 8px rgba(0,0,0,0.2);
+}
+input:hover {
+    border-radius: 4px;
+    
+}
+input[type=text] {
+    font-family: "Roboto Mono", monospace;
+    font-weight: 600;
+
+}
+
+.modal {
+    
+    position: fixed;
+
+}
+.container {
+    position: absolute;
+    padding: 10px;
+    background-color: black;
+    color: white;
+    border-radius: 10px;
+    
+    width: 650px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.backdrop {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 100vw;
+    height: 100svh;
+    background-color: rgba(0, 0, 0, 0.313);
+    backdrop-filter: blur(20px);
+}
+a {
+    color: rgb(140, 140, 255)
+}
+
+#madewith {
+    position: absolute;
+    bottom: 20px;
+    text-align: center;
+    width: 100vw;
+}
+.hidden {
+    display: none;
+    
+}
+.close {
+    background-color: transparent;
+    right: 20px;
+    color: white;
+    border: none;
+    float: right;
+    height: 26px;
+    width: 26px;
+    font-weight: 700;
+    font-size: 22px;
+}

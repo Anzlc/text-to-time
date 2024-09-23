@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<link rel="stylesheet" href="styles.css" />
+		<script src="./pkg/wasm.js" type="module"></script>
+		<script type="module">
+			import init, { generate_response } from "./pkg/wasm.js";
+
+			async function run() {
+				await init();
+			}
+
+			run();
+		</script>
+		<script src="./index.js" type="module" defer></script>
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap");
+		</style>
+	</head>
+	<body>
+		<input type="text" id="natural-input" maxlength="64" />
+		<p id="formated-output">00:00</p>
+		<div id="bottom">
+			<a href="https://github.com/Anzlc/text-to-time" target="_blank"
+				><img class="button" src="assets/github.svg" alt="github"
+			/></a>
+
+			<button
+				onclick="javascript:toggleInfo()"
+				style="background-color: rgba(0, 0, 0, 0.01); border: none"
+			>
+				<img
+					class="button"
+					src="assets/info.svg"
+					style="pointer-events: none"
+					alt="info"
+				/>
+			</button>
+		</div>
+		<p id="madewith">
+			Made with <span style="color: rgb(255, 112, 112)">❤</span> by Anzlc
+		</p>
+		<div class="modal hidden">
+			<div class="backdrop"></div>
+			<div class="container">
+				<button class="close" onclick="toggleInfo()">X</button>
+				<h2>Text to Time</h2>
+				<p>
+					A natural language to formatted time converter that
+					interprets Slovenian time expressions. For example, if you
+					input "pol šestih popoldne," the converter will return
+					"17:30." I created this project as a way to explore Neural
+					Networks, Machine Learning, Rust, and WebAssembly. The model
+					currently achieves approximately 65% accuracy on test data,
+					so its outputs may not always be precise.
+					<br />
+					You can check out the project on
+					<a
+						href="https://github.com/Anzlc/text-to-time"
+						target="_blank"
+						>GitHub</a
+					>.
+				</p>
+				<h3>Tips</h3>
+				<p>
+					To improve accuracy, you can use keywords like "zvečer"
+					"zjutraj" "popoldne" or "dopoldne" to help the model
+					interpret the correct time.
+				</p>
+			</div>
+		</div>
+	</body>
+</html>

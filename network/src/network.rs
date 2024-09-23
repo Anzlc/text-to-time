@@ -195,6 +195,7 @@ impl Network<'_> {
                 }
             }
         }
+
         file.write(&buffer)?;
         Ok(())
     }

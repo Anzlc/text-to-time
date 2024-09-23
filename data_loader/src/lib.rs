@@ -3,6 +3,7 @@ pub mod prepare;
 pub use prepare::*;
 pub use csv_parser::read_and_parse_time;
 
+#[derive(Clone)]
 pub struct TimeData {
     natural_time: String,
     formatted_time: String,

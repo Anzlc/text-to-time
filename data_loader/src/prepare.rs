@@ -1,5 +1,5 @@
 use std::{ collections::HashMap, fs::File, io::{ self, Write } };
-
+use rand::Rng;
 use crate::TimeData;
 
 pub struct TrainingData {
@@ -16,6 +16,8 @@ impl TrainingData {
         }
     }
     pub fn generate_training_data(data: &[TimeData]) -> TrainingData {
+        let data = reservoir_sample(data, data.len());
+
         let mut inputs: Vec<[f64; 64]> = Vec::new();
         let mut outputs: Vec<[f64; 84]> = Vec::new();
 
@@ -123,4 +125,23 @@ impl TrainingData {
             self.character_map.insert(k, v);
         }
     }
+}
+
+fn reservoir_sample<S: Clone>(S: &[S], k: usize) -> Vec<S> {
+    let mut R = Vec::with_capacity(k);
+
+    for i in 0..k {
+        R.push(S[i].clone());
+    }
+
+    let mut rng = rand::thread_rng();
+
+    for i in k..S.len() {
+        let j = rng.gen_range(0..=i);
+        {
+            R[j] = S[i].clone();
+        }
+    }
+
+    R
 }

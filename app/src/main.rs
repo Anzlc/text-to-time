@@ -5,8 +5,8 @@ fn main() {
     println!("Hello, world!");
     let data = read_and_parse_time("./data.csv");
     let training_data = TrainingData::generate_training_data(&data);
-    let mut network: Network<'_> = Network::new(&[64, 256, 256, 84], SIGMOID, 0.125);
-
+    let mut network: Network<'_> = Network::new(&[64, 256, 256, 84], SIGMOID, 0.1);
+    training_data.save_map("map.data");
     const TRAINING_PERCENTAGE: f64 = 0.9;
     let testing_count = (
         (training_data.get_training_input().len() as f64) * TRAINING_PERCENTAGE
@@ -26,7 +26,7 @@ fn main() {
     );
 
     //network.save("network.data");
-    // network.load("network.data");
+    //network.load("network.data");
 
     loop {
         let mut input = String::new();
