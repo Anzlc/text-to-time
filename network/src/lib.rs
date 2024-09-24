@@ -1,3 +1,5 @@
+// https://youtu.be/DKbz9pNXVdE?si=YaZFDLdBddsChYFt
+
 mod matrix;
 mod network;
 mod activation;
