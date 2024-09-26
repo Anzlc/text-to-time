@@ -1,4 +1,5 @@
 mod matrix;
+pub mod dataset;
 mod network;
 mod activation;
 

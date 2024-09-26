@@ -130,3 +130,45 @@ a {
     font-weight: 700;
     font-size: 22px;
 }
+.close-mobile {
+    display: none;
+}
+@media  only screen and (max-width: 850px) {
+    .container{
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        width: 100vw;
+        height: 100svh;
+        top: 0;
+        left: 0;
+        transform: translate(-50%, -50%);
+        
+        padding: 80px;
+    }
+
+    .close {
+        display: none;
+    }
+    .close-mobile {
+        display: block;
+        
+        background-color: white;
+        font-family: "Roboto Mono", monospace;
+        font-weight: 700;
+        height: 2em;
+        width: 10em;
+        font-size: 20px;
+        border: none;
+        border-radius: 6px;
+        margin-top: 1em;
+        
+        transition: all 200ms;
+    }
+    .close-mobile:hover {
+        transform: scale(1.1);
+    }
+    
+}

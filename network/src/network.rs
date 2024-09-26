@@ -1,6 +1,5 @@
 use std::{ fs::File, io::{ self, BufReader, Read, Write }, vec };
-use data_loader::TrainingData;
-use crate::{ activation::Activation, matrix::Matrix };
+use crate::{ activation::Activation, dataset::DataSet, matrix::Matrix };
 
 pub struct Network<'a> {
     layers: &'a [usize],
@@ -94,51 +93,17 @@ impl Network<'_> {
         println!("Finished training");
     }
 
-    pub fn train_with_testing(
+    pub fn train_with_testing<T>(
         &mut self,
-        inputs_training: &Vec<Vec<f64>>,
-        targets_training: &Vec<Vec<f64>>,
-        inputs_testing: &Vec<Vec<f64>>,
-        targets_testing: &Vec<Vec<f64>>
-    ) {
+        data_set: &T,
+        file: &str,
+        test_function: &dyn Fn(&[f64], &[f64]) -> bool
+    )
+        where T: DataSet
+    {
         let mut prev_best = 0;
-        loop {
-            for _ in 0..200 {
-                for j in 0..inputs_training.len() {
-                    let outputs = self.feed_forward(&inputs_training[j]);
-
-                    self.back_propagate(&outputs, &targets_training[j]);
-                }
-            }
-
-            let mut correct = 0;
-            for (i, inputs) in inputs_testing.into_iter().enumerate() {
-                if
-                    TrainingData::from_output(&self.feed_forward(&inputs)) ==
-                    TrainingData::from_output(&targets_testing[i])
-                {
-                    correct += 1;
-                }
-            }
-            if correct < prev_best {
-                break;
-            }
-            prev_best = correct;
-            print!("Current best: {}\r", prev_best);
-            let _ = std::io::stdout().flush();
-        }
-        println!("");
-    }
-
-    pub fn train_with_testing_and_save(
-        &mut self,
-        inputs_training: &Vec<Vec<f64>>,
-        targets_training: &Vec<Vec<f64>>,
-        inputs_testing: &Vec<Vec<f64>>,
-        targets_testing: &Vec<Vec<f64>>,
-        file: &str
-    ) {
-        let mut prev_best = 0;
+        let (inputs_training, targets_training) = data_set.get_training_data();
+        let (inputs_testing, targets_testing) = data_set.get_testing_data();
 
         loop {
             for _ in 0..10 {
@@ -150,11 +115,8 @@ impl Network<'_> {
             }
 
             let mut correct = 0;
-            for (i, inputs) in inputs_testing.into_iter().enumerate() {
-                if
-                    TrainingData::from_output(&self.feed_forward(&inputs)) ==
-                    TrainingData::from_output(&targets_testing[i])
-                {
+            for (i, inputs) in inputs_testing.iter().enumerate() {
+                if test_function(&self.feed_forward(&inputs), &targets_testing[i]) {
                     correct += 1;
                 }
             }

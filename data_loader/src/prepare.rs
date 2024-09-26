@@ -1,7 +1,7 @@
 use std::{ collections::HashMap, fs::File, io::{ self, Write } };
 use rand::Rng;
 use crate::TimeData;
-
+use network::dataset::DataSet;
 pub struct TrainingData {
     character_map: HashMap<char, f64>,
     inputs: Vec<[f64; 64]>,
@@ -124,6 +124,26 @@ impl TrainingData {
         for (k, v) in values {
             self.character_map.insert(k, v);
         }
+    }
+}
+
+impl DataSet for TrainingData {
+    fn get_testing_data(&self) -> (Vec<Vec<f64>>, Vec<Vec<f64>>) {
+        let testing_count = ((self.get_training_input().len() as f64) * 0.9).floor() as usize;
+
+        let testing_input = &self.get_training_input()[testing_count..];
+        let testing_output = &self.get_training_output()[testing_count..];
+
+        (testing_input.to_vec(), testing_output.to_vec())
+    }
+
+    fn get_training_data(&self) -> (Vec<Vec<f64>>, Vec<Vec<f64>>) {
+        let testing_count = ((self.get_training_input().len() as f64) * 0.9).floor() as usize;
+
+        let training_input = &self.get_training_input()[..testing_count];
+        let training_output = &self.get_training_output()[..testing_count];
+
+        (training_input.to_vec(), training_output.to_vec())
     }
 }
 
